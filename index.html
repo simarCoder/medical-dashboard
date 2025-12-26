@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediCore - Patient Dashboard</title>
+    <!-- Google Fonts for modern typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- PDF Generation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- ===== SIDEBAR NAVIGATION ===== -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <i class="fa-solid fa-heart-pulse logo-icon"></i>
+                <h1 class="logo-text">MediCore</h1>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item active" data-page="dashboard">
+                    <a href="#"><i class="fa-solid fa-table-columns"></i><span>Dashboard</span></a>
+                </li>
+                 <li class="menu-item" data-page="diagnose">
+                    <a href="#"><i class="fa-solid fa-stethoscope"></i><span>Diagnose</span></a>
+                </li>
+                <li class="menu-item" data-page="tests">
+                    <a href="#"><i class="fa-solid fa-vial-virus"></i><span>Tests Info</span></a>
+                </li>
+                <li class="menu-item" data-page="analytics">
+                    <a href="#"><i class="fa-solid fa-chart-line"></i><span>Analytics</span></a>
+                </li>
+                <li class="menu-item" data-page="settings">
+                    <a href="#"><i class="fa-solid fa-gear"></i><span>Settings</span></a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <p>&copy; 2025 MediCore</p>
+            </div>
+        </nav>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <div class="main-content-scroll-area">
+            <!-- ===== DASHBOARD PAGE ===== -->
+            <main id="dashboard-page" class="main-content page-content">
+                <header class="main-header">
+                    <div class="header-title">
+                        <h2>Patient Dashboard</h2>
+                        <p>Manage and view patient records efficiently.</p>
+                    </div>
+                    <div class="header-actions">
+                        <div class="search-bar">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="patientSearch" placeholder="Search for patients...">
+                        </div>
+                        <button id="addPatientBtn" class="primary-btn">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Add New Patient</span>
+                        </button>
+                    </div>
+                </header>
+                <section class="patient-table-section">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Sr. No.</th>
+                                <th>Patient ID</th>
+                                <th>Name</th>
+                                <th>Age</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patientTableBody">
+                            <!-- Patient rows will be injected here by JavaScript -->
+                        </tbody>
+                    </table>
+                </section>
+            </main>
+            
+            <!-- ===== DIAGNOSE PAGE ===== -->
+            <main id="diagnose-page" class="main-content page-content hidden">
+                <header class="main-header">
+                    <div class="header-title">
+                        <h2>Patient Diagnosis</h2>
+                        <p>Enter test results for today's patients.</p>
+                    </div>
+                </header>
+                <section id="diagnosePatientList" class="diagnose-list">
+                    <!-- Patient diagnosis cards will be injected here -->
+                </section>
+            </main>
+
+            <!-- ===== TESTS INFO PAGE (UPDATED) ===== -->
+            <main id="tests-page" class="main-content page-content hidden">
+                <header class="main-header">
+                    <div class="header-title">
+                        <h2>Test Management</h2>
+                        <p>Add and configure laboratory tests and parameters.</p>
+                    </div>
+                </header>
+                <div class="test-management-layout">
+                    <div class="test-management-forms">
+                        <section class="card">
+                            <h3 class="card-header">Main Test Master</h3>
+                            <form id="mainTestForm" class="modal-form">
+                                <div class="form-group">
+                                    <label for="mt-code">Test Code (Short Name)</label>
+                                    <input type="text" id="mt-code" required placeholder="e.g., CBC">
+                                </div>
+                                <div class="form-group">
+                                    <label for="mt-name">Test Name</label>
+                                    <input type="text" id="mt-name" required placeholder="e.g., Complete Blood Count">
+                                </div>
+                                <div class="form-group">
+                                    <label for="mt-type">Test Type</label>
+                                    <select id="mt-type">
+                                        <option value="LAB">LAB (Value Based)</option>
+                                        <option value="CUL">CUL (Culture)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="mt-cost">Cost</label>
+                                    <input type="number" id="mt-cost" step="0.01" required placeholder="e.g., 350.00">
+                                </div>
+                                <footer class="modal-footer">
+                                    <button type="submit" class="primary-btn">Save Main Test</button>
+                                </footer>
+                            </form>
+                        </section>
+                        <section class="card">
+                            <h3 class="card-header">Sub Test (Parameter) Master</h3>
+                            <form id="subTestForm" class="modal-form">
+                                <div class="form-group">
+                                    <label for="st-main-code">Main Test Code</label>
+                                    <input type="text" id="st-main-code" required placeholder="e.g., CBC">
+                                </div>
+                                 <div class="form-group">
+                                    <label>Main Test Name</label>
+                                    <input type="text" id="st-main-name" readonly disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label for="st-sub-name">Parameter Name</label>
+                                    <input type="text" id="st-sub-name" required placeholder="e.g., RBC Count">
+                                </div>
+                                <div class="form-group">
+                                    <label for="st-units">Units</label>
+                                    <input type="text" id="st-units" placeholder="e.g., g/dL">
+                                </div>
+                                <div class="form-group">
+                                    <label for="st-ref-range">Reference Range</label>
+                                    <input type="text" id="st-ref-range" placeholder="e.g., 12.0 - 15.0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="st-method">Method</label>
+                                    <input type="text" id="st-method" placeholder="e.g., Microscopy">
+                                </div>
+                                <footer class="modal-footer">
+                                    <button type="submit" class="primary-btn">Save Parameter</button>
+                                </footer>
+                            </form>
+                        </section>
+                    </div>
+                    <div class="test-management-lists">
+                         <section class="card">
+                             <h3 class="card-header">Main Test List</h3>
+                             <div class="table-container">
+                                 <table>
+                                     <thead>
+                                         <tr>
+                                             <th>Code</th>
+                                             <th>Name</th>
+                                             <th>Cost</th>
+                                         </tr>
+                                     </thead>
+                                     <tbody id="mainTestTableBody"></tbody>
+                                 </table>
+                             </div>
+                        </section>
+                         <section class="card">
+                             <h3 class="card-header">Sub Test (Parameter) List</h3>
+                             <div class="table-container">
+                                 <table>
+                                     <thead>
+                                         <tr>
+                                             <th>Main Code</th>
+                                             <th>Parameter</th>
+                                             <th>Units</th>
+                                             <th>Ref. Range</th>
+                                         </tr>
+                                     </thead>
+                                     <tbody id="subTestTableBody"></tbody>
+                                 </table>
+                             </div>
+                        </section>
+                    </div>
+                </div>
+            </main>
+
+            <!-- ===== ANALYTICS PAGE ===== -->
+            <main id="analytics-page" class="main-content page-content hidden">
+                <header class="main-header">
+                    <div class="header-title">
+                        <h2>Analytics</h2>
+                        <p>Generate financial and patient reports.</p>
+                    </div>
+                </header>
+                 <section class="card">
+                     <h3 class="card-header">Generate Reports</h3>
+                     <div class="analytics-controls">
+                         <select id="reportType">
+                             <option value="weekly">Weekly Analysis</option>
+                             <option value="monthly">Monthly Analysis</option>
+                             <option value="yearly">Yearly Analysis</option>
+                             <option value="custom">Custom Date Range</option>
+                         </select>
+                         <div id="customDateRange" class="hidden">
+                             <input type="date" id="startDate">
+                             <span>to</span>
+                             <input type="date" id="endDate">
+                         </div>
+                         <button id="generateReportBtn" class="primary-btn">Generate</button>
+                     </div>
+                 </section>
+            </main>
+
+            <!-- ===== SETTINGS PAGE ===== -->
+            <main id="settings-page" class="main-content page-content hidden">
+                <header class="main-header">
+                     <div class="header-title">
+                        <h2>Settings</h2>
+                        <p>Customize application and receipt layout.</p>
+                    </div>
+                </header>
+                <div class="settings-layout">
+                    <section class="card">
+                        <h3 class="card-header">Receipt Layout & Sizing</h3>
+                        <div class="settings-form-grid">
+                            <div class="form-group">
+                                <label for="receiptWidth">Width (mm)</label>
+                                <input type="number" id="receiptWidth" class="receipt-style-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="receiptHeight">Height (mm)</label>
+                                <input type="number" id="receiptHeight" class="receipt-style-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="marginTop">Top Margin (mm)</label>
+                                <input type="number" id="marginTop" class="receipt-style-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="marginBottom">Bottom Margin (mm)</label>
+                                <input type="number" id="marginBottom" class="receipt-style-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="marginLeft">Left Margin (mm)</label>
+                                <input type="number" id="marginLeft" class="receipt-style-input">
+                            </div>
+                             <div class="form-group">
+                                <label for="marginRight">Right Margin (mm)</label>
+                                <input type="number" id="marginRight" class="receipt-style-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="fontSize">Font Size (px)</label>
+                                <input type="number" id="fontSize" class="receipt-style-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="tableCellPadding">Table Padding (px)</label>
+                                <input type="number" id="tableCellPadding" class="receipt-style-input">
+                            </div>
+                            <div class="form-group form-group-full">
+                                <label for="textAlign">Header/Footer Alignment</label>
+                                <select id="textAlign" class="receipt-style-input">
+                                    <option value="center">Center</option>
+                                    <option value="left">Left</option>
+                                    <option value="right">Right</option>
+                                </select>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="card">
+                        <h3 class="card-header">Live Preview</h3>
+                        <div class="receipt-preview-container">
+                            <div id="receiptPreview" class="receipt-preview-box">
+                                <!-- Live preview will be rendered here -->
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- ===== ADD/EDIT PATIENT MODAL ===== -->
+    <div id="addPatientModal" class="modal-overlay">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3 id="modalTitle">Add New Patient Record</h3>
+                <button id="closeModalBtn" class="close-btn">&times;</button>
+            </header>
+            <form id="addPatientForm" class="modal-body">
+                <div class="modal-form-content">
+                    <input type="hidden" id="patientId">
+                    <div class="form-grid">
+                         <div class="form-group">
+                            <label for="fullName">Full Name</label>
+                            <input type="text" id="fullName" name="fullName" placeholder="e.g., Ananya Gupta" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="age">Age</label>
+                            <input type="number" id="age" name="age" placeholder="e.g., 45" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="gender">Gender</label>
+                            <select id="gender" name="gender" required>
+                                <option value="" disabled selected>Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact">Contact Number</label>
+                            <input type="tel" id="contact" name="contact" placeholder="e.g., 9876543210">
+                        </div>
+                        <div class="form-group">
+                            <label for="referral">Referred By</label>
+                            <input type="text" id="referral" name="referral" value="SELF">
+                        </div>
+                         <div class="form-group">
+                            <label for="paymentMode">Payment Mode</label>
+                            <select id="paymentMode" name="paymentMode">
+                                <option value="CASH">CASH</option>
+                                <option value="CREDIT">CREDIT</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="testSelectionSection" class="test-selection-area">
+                        <h4>Select Tests</h4>
+                        <div class="add-test-bar">
+                            <input type="text" id="testSearch" list="testOptions" placeholder="Type to search for a test...">
+                            <datalist id="testOptions"></datalist>
+                            <button type="button" id="addTestToPatientBtn" class="secondary-btn">Add</button>
+                        </div>
+                        <div class="selected-tests-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Test Name</th>
+                                        <th>Cost</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="selectedTestsTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <footer class="modal-footer">
+                    <div class="payment-summary">
+                        <span>Total: <strong id="totalAmount">0.00</strong></span>
+                        <div class="form-group-inline">
+                            <label for="discount">Discount:</label>
+                            <input type="number" id="discount" value="0">
+                        </div>
+                        <span>Payable: <strong id="payableAmount">0.00</strong></span>
+                        <div class="form-group-inline">
+                            <label for="paidAmount">Paid:</label>
+                            <input type="number" id="paidAmount">
+                        </div>
+                        <span>Balance: <strong id="balanceAmount">0.00</strong></span>
+                    </div>
+                    <div class="footer-buttons">
+                        <button type="button" class="secondary-btn" id="cancelBtn">Cancel</button>
+                        <button type="submit" class="primary-btn" id="modalSubmitBtn">Save & Generate PDF Receipt</button>
+                    </div>
+                </footer>
+            </form>
+        </div>
+    </div>
+    
+    <!-- ===== VIEW TEST DETAILS MODAL ===== -->
+    <div id="testDetailsModal" class="modal-overlay">
+         <div class="modal-content">
+            <header class="modal-header">
+                <h3>Test Details for <span id="detailsPatientName"></span></h3>
+                <button id="closeTestDetailsBtn" class="close-btn">&times;</button>
+            </header>
+            <div class="modal-body">
+                <p><strong>Patient ID:</strong> <span id="detailsPatientId"></span></p>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Test Code</th>
+                                <th>Test Name</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patientTestsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+             <footer class="modal-footer">
+                <button type="button" class="secondary-btn" id="cancelTestDetailsBtn">Close</button>
+            </footer>
+        </div>
+    </div>
+    
+    <!-- ===== ENTER DIAGNOSIS RESULTS MODAL ===== -->
+    <div id="diagnoseModal" class="modal-overlay">
+        <div class="modal-content modal-lg">
+            <header class="modal-header">
+                <h3>Enter Test Results</h3>
+                <button id="closeDiagnoseModalBtn" class="close-btn">&times;</button>
+            </header>
+            <div class="modal-body">
+                <div class="diagnose-patient-info">
+                    <p><strong>Patient:</strong> <span id="diagPatientName"></span></p>
+                    <p><strong>Age/Sex:</strong> <span id="diagPatientAgeSex"></span></p>
+                    <p><strong>Test:</strong> <span id="diagTestName"></span></p>
+                </div>
+                <form id="diagnoseForm">
+                    <input type="hidden" id="diagPatientId">
+                    <input type="hidden" id="diagTestCode">
+                    <div id="diagnoseFormBody" class="diagnose-form-body">
+                        <!-- Result input fields will be injected here -->
+                    </div>
+                </form>
+            </div>
+            <footer class="modal-footer">
+                <button type="button" class="secondary-btn" id="cancelDiagnoseBtn">Cancel</button>
+                <button type="button" class="primary-btn" id="saveDiagnoseBtn">Save Results</button>
+            </footer>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
